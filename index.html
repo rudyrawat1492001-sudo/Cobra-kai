@@ -1,34 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cobra Kai Tournament</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="overlay"></div>
-  <div class="container">
-    <h1 class="title">Cobra Kai Tournament</h1>
-    <h2 class="subtitle">🔥 League Stage 🔥</h2>
+  <h1>Cobra Kai Tournament</h1>
 
+  <!-- Add Player Section -->
+  <div id="player-setup" class="section">
+    <h2>⚡ Add Players ⚡</h2>
+    <input type="text" id="playerName" placeholder="Enter player name">
+    <button id="addPlayer">Add Player</button>
+    <button id="startTournament">Start Tournament</button>
+
+    <div id="playerList"></div>
+  </div>
+
+  <!-- Tournament Section -->
+  <div id="tournament" class="section hidden">
+    <h2>🔥 League Stage 🔥</h2>
     <div id="matches"></div>
-
-    <h2 class="subtitle">🏅 Leaderboard</h2>
-    <table id="leaderboard">
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Wins</th>
-          <th>Matches</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <button id="qualifyButton">Show Top 16 Qualifiers</button>
-    <div id="qualifiers"></div>
   </div>
 
   <script src="script.js"></script>
