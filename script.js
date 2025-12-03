@@ -1,12 +1,4 @@
-const players = [
-  "Naruto", "Sasuke", "Sakura", "Kakashi", "Hinata", "Neji", "Rock Lee",
-  "Gaara", "Temari", "Shikamaru", "Choji", "Ino", "Kiba", "Shino",
-  "Sai", "Tenten", "Killer Bee", "Minato", "Itachi", "Madara", "Obito",
-  "Pain", "Konan", "Kabuto", "Jiraiya", "Tsunade", "Orochimaru", "Kurenai",
-  "Asuma", "Might Guy", "Kisame", "Hidan", "Deidara", "Sasori", "Tobirama",
-  "Hashirama", "Boruto", "Sarada", "Mitsuki", "Hanabi", "Kawaki", "Jugo",
-  "Suigetsu", "Karin"
-];
+const players = [];
 
 let playerData = {};
 players.forEach(p => playerData[p] = { wins: 0, matches: 0, points: 0 });
@@ -82,3 +74,4 @@ document.getElementById("qualifyButton").addEventListener("click", () => {
 
 generateMatches();
 updateLeaderboard();
+
