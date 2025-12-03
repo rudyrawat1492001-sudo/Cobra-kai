@@ -1,77 +1,76 @@
-const players = [];
+let players = [];
+let matches = [];
 
-let playerData = {};
-players.forEach(p => playerData[p] = { wins: 0, matches: 0, points: 0 });
+const playerNameInput = document.getElementById("playerName");
+const addPlayerBtn = document.getElementById("addPlayer");
+const playerListDiv = document.getElementById("playerList");
+const startTournamentBtn = document.getElementById("startTournament");
+const tournamentDiv = document.getElementById("tournament");
+const matchesDiv = document.getElementById("matches");
 
-function getRandomOpponent(currentPlayer, excludeList) {
-  let available = players.filter(p => p !== currentPlayer && !excludeList.includes(p));
-  return available[Math.floor(Math.random() * available.length)];
-}
-
-function generateMatches() {
-  const matchContainer = document.getElementById("matches");
-  matchContainer.innerHTML = "";
-
-  players.forEach(player => {
-    let opponents = [];
-    for (let i = 0; i < 3; i++) {
-      const opponent = getRandomOpponent(player, opponents);
-      opponents.push(opponent);
-
-      const div = document.createElement("div");
-      div.classList.add("match");
-      div.innerHTML = `
-        <p>🔥 <b>${player}</b> vs <b>${opponent}</b></p>
-        <button class="win-btn" onclick="recordResult('${player}', true)">Win</button>
-        <button class="lose-btn" onclick="recordResult('${player}', false)">Lose</button>
-      `;
-      matchContainer.appendChild(div);
-    }
-  });
-}
-
-function recordResult(player, isWin) {
-  playerData[player].matches++;
-  if (isWin) {
-    playerData[player].wins++;
-    playerData[player].points += 3;
+// Add player to the list
+addPlayerBtn.addEventListener("click", () => {
+  const name = playerNameInput.value.trim();
+  if (name && !players.includes(name)) {
+    players.push(name);
+    updatePlayerList();
+    playerNameInput.value = "";
+  } else if (players.includes(name)) {
+    alert("Player already added!");
+  } else {
+    alert("Please enter a valid name!");
   }
-  updateLeaderboard();
-}
-
-function updateLeaderboard() {
-  const tbody = document.querySelector("#leaderboard tbody");
-  tbody.innerHTML = "";
-
-  const sorted = Object.entries(playerData)
-    .sort((a, b) => b[1].points - a[1].points || b[1].wins - a[1].wins);
-
-  sorted.forEach(([name, data]) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${name}</td>
-      <td>${data.wins}</td>
-      <td>${data.matches}</td>
-      <td>${data.points}</td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-document.getElementById("qualifyButton").addEventListener("click", () => {
-  const qualified = Object.entries(playerData)
-    .filter(([_, data]) => data.wins >= 2)
-    .sort((a, b) => b[1].points - a[1].points)
-    .slice(0, 16)
-    .map(([name]) => name);
-
-  const qDiv = document.getElementById("qualifiers");
-  qDiv.innerHTML = `
-    <h3>🔥 Top 16 Qualifiers 🔥</h3>
-    <p>${qualified.join(", ")}</p>
-  `;
 });
 
-generateMatches();
-updateLeaderboard();
+// Update player list on screen
+function updatePlayerList() {
+  playerListDiv.innerHTML = `
+    <h3>Players Added (${players.length}):</h3>
+    <ul>${players.map(p => `<li>${p}</li>`).join("")}</ul>
+  `;
+}
 
+// Start the tournament
+startTournamentBtn.addEventListener("click", () => {
+  if (players.length < 4) {
+    alert("Add at least 4 players to start the tournament!");
+    return;
+  }
+  document.getElementById("player-setup").classList.add("hidden");
+  tournamentDiv.classList.remove("hidden");
+  generateMatches();
+});
+
+// Generate 3 random matches for each player
+function generateMatches() {
+  matches = [];
+  players.forEach(player => {
+    const opponents = players.filter(p => p !== player);
+    const selectedOpponents = opponents.sort(() => 0.5 - Math.random()).slice(0, 3);
+    selectedOpponents.forEach(opp => {
+      matches.push({ p1: player, p2: opp, result: null });
+    });
+  });
+  renderMatches();
+}
+
+// Display matches on the screen
+function renderMatches() {
+  matchesDiv.innerHTML = "";
+  matches.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.className = "match";
+    div.innerHTML = `
+      <h3>🔥 ${m.p1} vs ${m.p2}</h3>
+      <button class="win" onclick="setResult(${i}, '${m.p1}')">Win</button>
+      <button class="lose" onclick="setResult(${i}, '${m.p2}')">Lose</button>
+    `;
+    matchesDiv.appendChild(div);
+  });
+}
+
+// Set match result
+function setResult(index, winner) {
+  matches[index].result = winner;
+  renderMatches();
+}
