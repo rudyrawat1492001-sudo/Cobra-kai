@@ -52,6 +52,7 @@ button:hover {
 #savePlayers { background-color: #1e90ff; color: white; }
 #clearData { background-color: #555; color: white; }
 #startTournament { background-color: gold; color: black; }
+#showPoints { background-color: #00c851; color: white; }
 
 .hidden { display: none; }
 
@@ -66,3 +67,24 @@ button:hover {
 
 .win { background: red; color: white; }
 .lose { background: gray; color: white; }
+
+table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: 2px solid gold;
+  box-shadow: 0 0 10px #ffcc00;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid gold;
+  text-align: center;
+}
+
+th {
+  background: gold;
+  color: black;
+}
