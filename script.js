@@ -1,5 +1,6 @@
 let players = [];
 let matches = [];
+let points = {}; // Track player points, wins, losses
 
 const playerNameInput = document.getElementById("playerName");
 const addPlayerBtn = document.getElementById("addPlayer");
@@ -9,58 +10,60 @@ const playerListDiv = document.getElementById("playerList");
 const startTournamentBtn = document.getElementById("startTournament");
 const tournamentDiv = document.getElementById("tournament");
 const matchesDiv = document.getElementById("matches");
+const pointsTableDiv = document.getElementById("pointsTable");
+const showPointsBtn = document.getElementById("showPoints");
 
-// Load saved players and matches
 window.onload = function () {
   const savedPlayers = JSON.parse(localStorage.getItem("players"));
   const savedMatches = JSON.parse(localStorage.getItem("matches"));
+  const savedPoints = JSON.parse(localStorage.getItem("points"));
 
-  if (savedPlayers && savedPlayers.length > 0) {
-    players = savedPlayers;
-    updatePlayerList();
-  }
-  if (savedMatches && savedMatches.length > 0) {
-    matches = savedMatches;
+  if (savedPlayers) players = savedPlayers;
+  if (savedMatches) matches = savedMatches;
+  if (savedPoints) points = savedPoints;
+
+  if (players.length > 0) updatePlayerList();
+  if (matches.length > 0) {
     document.getElementById("player-setup").classList.add("hidden");
     tournamentDiv.classList.remove("hidden");
     renderMatches();
   }
 };
 
-// Add player
+// Add Player
 addPlayerBtn.addEventListener("click", () => {
   const name = playerNameInput.value.trim();
   if (name && !players.includes(name)) {
     players.push(name);
+    points[name] = { wins: 0, losses: 0, pts: 0 };
     updatePlayerList();
     playerNameInput.value = "";
-  } else if (players.includes(name)) {
-    alert("Player already added!");
-  } else {
-    alert("Please enter a valid name!");
-  }
+  } else alert("Enter valid or new player name!");
 });
 
-// Save player list
+// Save Players
 savePlayersBtn.addEventListener("click", () => {
   localStorage.setItem("players", JSON.stringify(players));
-  alert("✅ Player list saved successfully!");
+  localStorage.setItem("points", JSON.stringify(points));
+  alert("✅ Player list saved!");
 });
 
-// Clear all data
+// Clear Data
 clearDataBtn.addEventListener("click", () => {
-  if (confirm("⚠️ Are you sure you want to clear all saved data?")) {
+  if (confirm("⚠️ Clear all data?")) {
     localStorage.clear();
     players = [];
     matches = [];
+    points = {};
     playerListDiv.innerHTML = "";
     matchesDiv.innerHTML = "";
+    pointsTableDiv.innerHTML = "";
     document.getElementById("player-setup").classList.remove("hidden");
     tournamentDiv.classList.add("hidden");
-    alert("🗑️ All data cleared!");
   }
 });
 
+// Update Player List
 function updatePlayerList() {
   playerListDiv.innerHTML = `
     <h3>Players Added (${players.length}):</h3>
@@ -68,31 +71,27 @@ function updatePlayerList() {
   `;
 }
 
-// Start the tournament
+// Start Tournament
 startTournamentBtn.addEventListener("click", () => {
-  if (players.length < 4) {
-    alert("Add at least 4 players to start the tournament!");
-    return;
-  }
+  if (players.length < 4) return alert("Add at least 4 players!");
   document.getElementById("player-setup").classList.add("hidden");
   tournamentDiv.classList.remove("hidden");
   generateMatches();
 });
 
-// Generate 3 random matches per player
+// Generate matches (3 random opponents per player)
 function generateMatches() {
   matches = [];
-  players.forEach(player => {
-    const opponents = players.filter(p => p !== player);
-    const selectedOpponents = opponents.sort(() => 0.5 - Math.random()).slice(0, 3);
-    selectedOpponents.forEach(opp => {
-      matches.push({ p1: player, p2: opp, result: null });
-    });
+  players.forEach(p => {
+    const opp = players.filter(o => o !== p);
+    const selected = opp.sort(() => 0.5 - Math.random()).slice(0, 3);
+    selected.forEach(o => matches.push({ p1: p, p2: o, result: null }));
   });
   localStorage.setItem("matches", JSON.stringify(matches));
   renderMatches();
 }
 
+// Render Matches
 function renderMatches() {
   matchesDiv.innerHTML = "";
   matches.forEach((m, i) => {
@@ -100,15 +99,40 @@ function renderMatches() {
     div.className = "match";
     div.innerHTML = `
       <h3>🔥 ${m.p1} vs ${m.p2}</h3>
-      <button class="win" onclick="setResult(${i}, '${m.p1}')">Win</button>
-      <button class="lose" onclick="setResult(${i}, '${m.p2}')">Lose</button>
+      <button class="win" onclick="setResult(${i}, '${m.p1}', '${m.p2}', true)">Win</button>
+      <button class="lose" onclick="setResult(${i}, '${m.p2}', '${m.p1}', false)">Lose</button>
     `;
     matchesDiv.appendChild(div);
   });
 }
 
-function setResult(index, winner) {
+// Set Match Result + Update Points
+function setResult(index, winner, loser, winFlag) {
   matches[index].result = winner;
+  points[winner].wins++;
+  points[winner].pts += 3;
+  points[loser].losses++;
   localStorage.setItem("matches", JSON.stringify(matches));
+  localStorage.setItem("points", JSON.stringify(points));
   renderMatches();
 }
+
+// Show Points Table
+showPointsBtn.addEventListener("click", () => {
+  const tableRows = Object.entries(points)
+    .map(([name, data]) => `
+      <tr>
+        <td>${name}</td>
+        <td>${data.wins}</td>
+        <td>${data.losses}</td>
+        <td>${data.pts}</td>
+      </tr>
+    `).join("");
+  pointsTableDiv.innerHTML = `
+    <table>
+      <tr><th>Player</th><th>Wins</th><th>Losses</th><th>Points</th></tr>
+      ${tableRows}
+    </table>
+  `;
+  pointsTableDiv.classList.remove("hidden");
+});
