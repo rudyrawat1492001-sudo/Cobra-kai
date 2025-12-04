@@ -3,12 +3,31 @@ let matches = [];
 
 const playerNameInput = document.getElementById("playerName");
 const addPlayerBtn = document.getElementById("addPlayer");
+const savePlayersBtn = document.getElementById("savePlayers");
+const clearDataBtn = document.getElementById("clearData");
 const playerListDiv = document.getElementById("playerList");
 const startTournamentBtn = document.getElementById("startTournament");
 const tournamentDiv = document.getElementById("tournament");
 const matchesDiv = document.getElementById("matches");
 
-// Add player to the list
+// Load saved players and matches
+window.onload = function () {
+  const savedPlayers = JSON.parse(localStorage.getItem("players"));
+  const savedMatches = JSON.parse(localStorage.getItem("matches"));
+
+  if (savedPlayers && savedPlayers.length > 0) {
+    players = savedPlayers;
+    updatePlayerList();
+  }
+  if (savedMatches && savedMatches.length > 0) {
+    matches = savedMatches;
+    document.getElementById("player-setup").classList.add("hidden");
+    tournamentDiv.classList.remove("hidden");
+    renderMatches();
+  }
+};
+
+// Add player
 addPlayerBtn.addEventListener("click", () => {
   const name = playerNameInput.value.trim();
   if (name && !players.includes(name)) {
@@ -22,7 +41,26 @@ addPlayerBtn.addEventListener("click", () => {
   }
 });
 
-// Update player list on screen
+// Save player list
+savePlayersBtn.addEventListener("click", () => {
+  localStorage.setItem("players", JSON.stringify(players));
+  alert("✅ Player list saved successfully!");
+});
+
+// Clear all data
+clearDataBtn.addEventListener("click", () => {
+  if (confirm("⚠️ Are you sure you want to clear all saved data?")) {
+    localStorage.clear();
+    players = [];
+    matches = [];
+    playerListDiv.innerHTML = "";
+    matchesDiv.innerHTML = "";
+    document.getElementById("player-setup").classList.remove("hidden");
+    tournamentDiv.classList.add("hidden");
+    alert("🗑️ All data cleared!");
+  }
+});
+
 function updatePlayerList() {
   playerListDiv.innerHTML = `
     <h3>Players Added (${players.length}):</h3>
@@ -41,7 +79,7 @@ startTournamentBtn.addEventListener("click", () => {
   generateMatches();
 });
 
-// Generate 3 random matches for each player
+// Generate 3 random matches per player
 function generateMatches() {
   matches = [];
   players.forEach(player => {
@@ -51,10 +89,10 @@ function generateMatches() {
       matches.push({ p1: player, p2: opp, result: null });
     });
   });
+  localStorage.setItem("matches", JSON.stringify(matches));
   renderMatches();
 }
 
-// Display matches on the screen
 function renderMatches() {
   matchesDiv.innerHTML = "";
   matches.forEach((m, i) => {
@@ -69,8 +107,8 @@ function renderMatches() {
   });
 }
 
-// Set match result
 function setResult(index, winner) {
   matches[index].result = winner;
+  localStorage.setItem("matches", JSON.stringify(matches));
   renderMatches();
 }
