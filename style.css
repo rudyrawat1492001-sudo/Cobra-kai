@@ -15,7 +15,7 @@ h1 {
 }
 
 .section {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   border: 2px solid gold;
   border-radius: 15px;
   margin: 30px auto;
@@ -44,23 +44,16 @@ button {
   transition: 0.2s;
 }
 
-#addPlayer {
-  background-color: #ff3b3b;
-  color: white;
-}
-
-#startTournament {
-  background-color: gold;
-  color: black;
-}
-
 button:hover {
   transform: scale(1.05);
 }
 
-.hidden {
-  display: none;
-}
+#addPlayer { background-color: #ff3b3b; color: white; }
+#savePlayers { background-color: #1e90ff; color: white; }
+#clearData { background-color: #555; color: white; }
+#startTournament { background-color: gold; color: black; }
+
+.hidden { display: none; }
 
 .match {
   background: rgba(40, 40, 40, 0.85);
@@ -71,12 +64,5 @@ button:hover {
   box-shadow: 0 0 10px #ffcc00;
 }
 
-.win {
-  background: red;
-  color: white;
-}
-
-.lose {
-  background: gray;
-  color: white;
-}
+.win { background: red; color: white; }
+.lose { background: gray; color: white; }
